@@ -1,3 +1,4 @@
+
 var distance = function(obj1, obj2) {
     return dist(obj1.x, obj1.y, obj2.x, obj2.y);
 };
@@ -20,6 +21,7 @@ var TestBall = function(x, y, radius) {
     Ball.call(this, x, y, radius);
     this.sRadius = 3*this.radius;
     this.objNear = false;
+    this.senseAccu = 15;
     
     var Point = function(x, y) {
         this.x = x;
@@ -37,9 +39,12 @@ var TestBall = function(x, y, radius) {
     Point.prototype.senseObj = function(that) {
         this.detecting = distance(this, that) < that.radius;
     };
-    this.sPoints = [new Point(this.x + (1/3)*this.sRadius, this.y),
-                    new Point(this.x + (2/3)*this.sRadius, this.y),
-                    new Point(this.x + this.sRadius, this.y)];
+    this.sPoints = [];
+    for (var i = 0; i < this.senseAccu; i++) {
+        var edge = this.x + this.radius;
+        var fraction = ((i+1)/this.senseAccu)*this.sRadius;
+        this.sPoints.push(new Point(edge + fraction, this.y));
+    }
 };
 TestBall.prototype = Object.create(Ball.prototype);
 TestBall.prototype.draw = function() {
@@ -57,17 +62,15 @@ TestBall.prototype.draw = function() {
     
 };
 TestBall.prototype.sense = function(arr) {
+    this.objNear = false;  //reset
     for (var i = 0; i < this.sPoints.length; i++) {
         for (var j = 0; j < arr.length; j++) {
             var pt = this.sPoints[i]; //alias
             pt.senseObj(arr[j]);
-            if (pt.detecting) {break;}
+            this.objNear = this.objNear || pt.detecting;
+            if (pt.detecting) {break;}  //if (this.objNear) {break;} ??
         }
     }
-    
-    this.objNear = this.sPoints[0].detecting ||
-                   this.sPoints[1].detecting ||
-                   this.sPoints[2].detecting;
 };
 
 /*** CONTROLLED BALL ***/
@@ -80,8 +83,8 @@ ControlledBall.prototype.update = function() {
     this.y = mouseY;
 };
 
-var test = new TestBall(200, 200, 50);
-var control = new ControlledBall(mouseX, mouseY, 20);
+var test = new TestBall(200, 200, 40);
+var control = new ControlledBall(mouseX, mouseY, 10);
 
 draw = function() {
     background(255);
