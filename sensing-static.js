@@ -2,21 +2,23 @@ var distance = function(obj1, obj2) {
     return dist(obj1.x, obj1.y, obj2.x, obj2.y);
 };
 
+/*** BALL ***/
 var Ball = function(x, y, radius) {
-    /**
-     * Ball position is based on polar coordinates, i.e.
-     * angle and radial distance. Instantiation of objects is done
-     * in cartesian coordinates, but that's translated to polar
-     * through dist() and atan2().
-     * The polar are then translated back to cartesian to draw the object.
-     */
     this.x = x;
     this.y = y;
     this.radius = radius;
+};
+Ball.prototype.draw = function() {
+    noFill();
+    stroke(0);
+    strokeWeight(1);
+    ellipse(this.x, this.y, 2*this.radius, 2*this.radius);
+};
+
+/*** TEST BALL ***/
+var TestBall = function(x, y, radius) {
+    Ball.call(this, x, y, radius);
     this.sRadius = 3*this.radius;
-    this.radDist = dist(this.x, this.y, 0, 0);
-    this.angle = atan2(this.y, this.x);
-    this.angVel = 5;
     this.objNear = false;
     
     var Point = function(x, y) {
@@ -39,7 +41,8 @@ var Ball = function(x, y, radius) {
                     new Point(this.x + (2/3)*this.sRadius, this.y),
                     new Point(this.x + this.sRadius, this.y)];
 };
-Ball.prototype.draw = function() {
+TestBall.prototype = Object.create(Ball.prototype);
+TestBall.prototype.draw = function() {
     noFill();
     strokeWeight(1);
     stroke(0);
@@ -53,24 +56,37 @@ Ball.prototype.draw = function() {
     }
     
 };
-Ball.prototype.update = function() {
-    this.x = this.radDist * cos(this.angle);
-    this.y = this.radDist * sin(this.angle);
-    
-    this.angle += this.angVel;
-};
-Ball.prototype.sense = function(arr) {
+TestBall.prototype.sense = function(arr) {
     for (var i = 0; i < this.sPoints.length; i++) {
         for (var j = 0; j < arr.length; j++) {
-            var pt = this.sPoints[i];
+            var pt = this.sPoints[i]; //alias
             pt.senseObj(arr[j]);
-            this.objNear = this.objNear || pt.detecting;
+            if (pt.detecting) {break;}
         }
     }
+    
+    this.objNear = this.sPoints[0].detecting ||
+                   this.sPoints[1].detecting ||
+                   this.sPoints[2].detecting;
 };
-var test = new Ball(200, 200, 20);
+
+/*** CONTROLLED BALL ***/
+var ControlledBall = function(x, y, radius) {
+    Ball.call(this, x, y, radius);
+};
+ControlledBall.prototype = Object.create(Ball.prototype);
+ControlledBall.prototype.update = function() {
+    this.x = mouseX;
+    this.y = mouseY;
+};
+
+var test = new TestBall(200, 200, 50);
+var control = new ControlledBall(mouseX, mouseY, 20);
 
 draw = function() {
     background(255);
     test.draw();
+    test.sense([control]);
+    control.draw();
+    control.update();
 };
