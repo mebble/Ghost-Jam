@@ -1,11 +1,17 @@
+//offsets by which the coord system differs from the default
+var XOFF = width/2;
+var YOFF = height/2;
+
 var distance = function(obj1, obj2) {
     return dist(obj1.x, obj1.y, obj2.x, obj2.y);
 };
 
 /*** BALL ***/
-var Ball = function(x, y, radius) {
-    this.x = x;
-    this.y = y;
+var Ball = function(r, theta, radius) {
+    this.r = r;
+    this.theta = theta;
+    this.x = this.r * cos(this.theta);
+    this.y = this.r * sin(this.theta);
     this.radius = radius;
 };
 Ball.prototype.draw = function() {
@@ -16,15 +22,17 @@ Ball.prototype.draw = function() {
 };
 
 /*** TEST BALL ***/
-var TestBall = function(x, y, radius) {
-    Ball.call(this, x, y, radius);
-    this.sRadius = 3*this.radius;
+var TestBall = function(r, theta, radius) {
+    Ball.call(this, r, theta, radius);
+    this.sRadius = 3 * this.radius;
     this.objNear = false;
-    this.senseAccu = 8;
+    this.senseAccu = 5;
     
-    var Point = function(x, y) {
-        this.x = x;
-        this.y = y;
+    var Point = function(parent, r, theta) {
+        this.r = r;
+        this.theta = theta;
+        this.x = parent.x + this.r * cos(this.theta);
+        this.y = parent.y + this.r * sin(this.theta);
         this.detecting = false;
     };
     Point.prototype.draw = function() {
@@ -40,10 +48,12 @@ var TestBall = function(x, y, radius) {
     };
     this.sPoints = [];
     for (var i = 1; i <= this.senseAccu; i++) {
-        var edge = this.x + this.radius;
-        var senseWidth = this.sRadius - this.radius;
-        var fraction = ((i)/this.senseAccu)*senseWidth;
-        this.sPoints.push(new Point(edge + fraction, this.y));
+        for (var j = 0; j < 1; j += 1) {
+            var edge = this.radius;
+            var senseWidth = this.sRadius - this.radius;
+            var fraction = ((i)/this.senseAccu) * senseWidth;
+            this.sPoints.push(new Point(this, edge + fraction, j));
+        }
     }
 };
 TestBall.prototype = Object.create(Ball.prototype);
@@ -78,22 +88,27 @@ TestBall.prototype.sense = function(arr) {
 };
 
 /*** CONTROLLED BALL ***/
-var ControlledBall = function(x, y, radius) {
-    Ball.call(this, x, y, radius);
+var ControlledBall = function(r, theta, radius) {
+    Ball.call(this, r, theta, radius);
+    this.x = mouseX - XOFF;
+    this.y = mouseY - YOFF;
 };
 ControlledBall.prototype = Object.create(Ball.prototype);
 ControlledBall.prototype.update = function() {
-    this.x = mouseX;
-    this.y = mouseY;
+    this.x = mouseX - XOFF;
+    this.y = mouseY - YOFF;
 };
 
-var test = new TestBall(200, 200, 40);
-var control = new ControlledBall(mouseX, mouseY, 10);
+var test = new TestBall(0, 0, 20);
+var control = new ControlledBall(150, 0, 10);
 
 draw = function() {
     background(255);
-    test.draw();
+    pushMatrix();
+        translate(XOFF, YOFF);
+        test.draw();
+        control.draw();
+    popMatrix();
     test.sense([control]);
-    control.draw();
     control.update();
 };
