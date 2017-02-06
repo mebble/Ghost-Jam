@@ -55,6 +55,10 @@ TestBall.prototype.draw = function() {
     }
     ellipse(this.x, this.y, 2*this.radius, 2*this.radius);
     
+    //sensing region
+    stroke(224, 224, 224);
+    ellipse(this.x, this.y, 2*this.sRadius, 2*this.sRadius);
+    
     for (var i = 0; i < this.sPoints.length; i++) {
         this.sPoints[i].draw();
     }
