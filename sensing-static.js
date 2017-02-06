@@ -20,7 +20,7 @@ var TestBall = function(x, y, radius) {
     Ball.call(this, x, y, radius);
     this.sRadius = 3*this.radius;
     this.objNear = false;
-    this.senseAccu = 15;
+    this.senseAccu = 8;
     
     var Point = function(x, y) {
         this.x = x;
@@ -39,9 +39,10 @@ var TestBall = function(x, y, radius) {
         return distance(this, that) < that.radius;
     };
     this.sPoints = [];
-    for (var i = 0; i < this.senseAccu; i++) {
+    for (var i = 1; i <= this.senseAccu; i++) {
         var edge = this.x + this.radius;
-        var fraction = ((i+1)/this.senseAccu)*this.sRadius;
+        var senseWidth = this.sRadius - this.radius;
+        var fraction = ((i)/this.senseAccu)*senseWidth;
         this.sPoints.push(new Point(edge + fraction, this.y));
     }
 };
