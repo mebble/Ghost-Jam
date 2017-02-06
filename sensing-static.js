@@ -1,6 +1,7 @@
 //offsets by which the coord system differs from the default
 var XOFF = width/2;
 var YOFF = height/2;
+angleMode = "degrees";
 
 var distance = function(obj1, obj2) {
     return dist(obj1.x, obj1.y, obj2.x, obj2.y);
@@ -26,7 +27,12 @@ var TestBall = function(r, theta, radius) {
     Ball.call(this, r, theta, radius);
     this.sRadius = 3 * this.radius;
     this.objNear = false;
-    this.senseAccu = 5;
+    this.sPoints = [];
+    this.viewAngle = 90;
+    
+    //sensing accuracies
+    this.radialAcc = 5;
+    this.angAcc = 10;
     
     var Point = function(parent, r, theta) {
         this.r = r;
@@ -46,13 +52,17 @@ var TestBall = function(r, theta, radius) {
     Point.prototype.detect = function(that) {
         return distance(this, that) < that.radius;
     };
-    this.sPoints = [];
-    for (var i = 1; i <= this.senseAccu; i++) {
-        for (var j = 0; j < 1; j += 1) {
-            var edge = this.radius;
-            var senseWidth = this.sRadius - this.radius;
-            var fraction = ((i)/this.senseAccu) * senseWidth;
-            this.sPoints.push(new Point(this, edge + fraction, j));
+    
+    //create points
+    var halfView = floor(this.viewAngle/2);
+    for (var i = 1; i <= this.radialAcc; i++) {
+        for (var j = 1; j <= this.angAcc; j++) {
+            var radEdge = this.radius;
+            var angEdge = -halfView;
+            var radFrac = (i/this.radialAcc) * (this.sRadius - this.radius);
+            var angFrac = (j/this.angAcc) * this.viewAngle;
+            
+            this.sPoints.push(new Point(this, radEdge + radFrac, angEdge + angFrac));
         }
     }
 };
@@ -99,7 +109,7 @@ ControlledBall.prototype.update = function() {
     this.y = mouseY - YOFF;
 };
 
-var test = new TestBall(0, 0, 20);
+var test = new TestBall(0, 0, 47);
 var control = new ControlledBall(150, 0, 10);
 
 draw = function() {
