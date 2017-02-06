@@ -1,4 +1,3 @@
-
 var distance = function(obj1, obj2) {
     return dist(obj1.x, obj1.y, obj2.x, obj2.y);
 };
@@ -36,8 +35,8 @@ var TestBall = function(x, y, radius) {
         }
         point(this.x, this.y);
     };
-    Point.prototype.senseObj = function(that) {
-        this.detecting = distance(this, that) < that.radius;
+    Point.prototype.detect = function(that) {
+        return distance(this, that) < that.radius;
     };
     this.sPoints = [];
     for (var i = 0; i < this.senseAccu; i++) {
@@ -66,7 +65,7 @@ TestBall.prototype.sense = function(arr) {
     for (var i = 0; i < this.sPoints.length; i++) {
         for (var j = 0; j < arr.length; j++) {
             var pt = this.sPoints[i]; //alias
-            pt.senseObj(arr[j]);
+            pt.detecting = pt.detect(arr[j]);
             this.objNear = this.objNear || pt.detecting;
             if (pt.detecting) {break;}  //if (this.objNear) {break;} ??
         }
