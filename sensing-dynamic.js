@@ -29,14 +29,14 @@ var TestBall = function(r, theta, radius) {
     this.objNear = false;
     this.sPoints = [];
     this.viewAngle = 90;
-    this.direction = 73;
+    this.direction = 0;
     
     //sensing accuracies
     this.radialAcc = 5;
     this.angAcc = 10;
     
     var Point = function(parent, r, theta) {
-        this.parent = parent;
+        this.parent = parent;  //alias
         this.r = r;
         this.theta = this.parent.direction + theta;
         this.x = this.r * cos(this.theta) + this.parent.x;
@@ -49,6 +49,9 @@ var TestBall = function(r, theta, radius) {
         if (this.detecting) {
             stroke(255, 0, 0);
         }
+        
+        //minus parents coordinates because the point is drawn on parent's matrix
+        //with parent at the origin
         point(this.x - this.parent.x, this.y - this.parent.y);
     };
     Point.prototype.detect = function(that) {
@@ -70,31 +73,31 @@ var TestBall = function(r, theta, radius) {
 };
 TestBall.prototype = Object.create(Ball.prototype);
 TestBall.prototype.draw = function() {
-    
+    noFill();
     pushMatrix();
         translate(this.x, this.y);
-        
-        for (var i = 0; i < this.sPoints.length; i++) {
-            this.sPoints[i].draw();
-        }
-        
-        noFill();
-        strokeWeight(1);
-        stroke(0);
-        if (this.objNear) {
-            stroke(255, 0, 0);
-        }
-        rotate(this.direction);
-        ellipse(0, 0, 2*this.radius, 2*this.radius);
-        line(0, 0, 0 + this.radius, 0);
         
         //sensing region
         stroke(224, 224, 224);
         ellipse(0, 0, 2*this.sRadius, 2*this.sRadius);
         
+        //rotation of position of points is handled inside every point object
+        //hence their drawing is kept outside the influence of rotate(this.direction)
+        for (var i = 0; i < this.sPoints.length; i++) {
+            this.sPoints[i].draw();
+        }
         
+        rotate(this.direction);
+        
+        //draw ball
+        stroke(0);
+        if (this.objNear) {
+            stroke(255, 0, 0);
+        }
+        strokeWeight(1);
+        ellipse(0, 0, 2*this.radius, 2*this.radius);
+        line(0, 0, 0 + this.radius, 0);
     popMatrix();
-    
 };
 TestBall.prototype.sense = function(arr) {
     this.objNear = false;  //reset
