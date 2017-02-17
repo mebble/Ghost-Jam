@@ -46,7 +46,7 @@ var TestBall = function(r, theta, radius) {
         this.detecting = false;
     };
     Point.prototype.draw = function() {
-        strokeWeight(3);
+        strokeWeight(1);
         stroke(0);
         if (this.detecting) {
             stroke(255, 0, 0);
