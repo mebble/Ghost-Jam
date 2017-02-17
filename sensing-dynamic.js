@@ -25,11 +25,12 @@ Ball.prototype.draw = function() {
 /*** TEST BALL ***/
 var TestBall = function(r, theta, radius) {
     Ball.call(this, r, theta, radius);
+    this.angVel = 1;
     this.sRadius = 3 * this.radius;
     this.objNear = false;
     this.sPoints = [];
     this.viewAngle = 90;
-    this.direction = 0;
+    this.direction = this.theta + 90;
     
     //sensing accuracies
     this.radialAcc = 5;
@@ -117,8 +118,12 @@ TestBall.prototype.sense = function(arr) {
     }
 };
 TestBall.prototype.update = function() {
-    this.direction++;
-    this.theta++;
+    this.direction = this.theta + 90;
+    if (this.theta >= 180) {
+        this.theta = this.theta - 360;  //ensures -180 <= this.theta <= 180
+    }
+    this.theta += this.angVel;
+    
     this.x = this.r * cos(this.theta).toFixed(3);
     this.y = this.r * sin(this.theta).toFixed(3);
     
@@ -139,7 +144,7 @@ ControlledBall.prototype.update = function() {
     this.y = mouseY - YOFF;
 };
 
-var test = new TestBall(80, 0, 25);
+var test = new TestBall(100, 270, 10);
 var control = new ControlledBall(150, 0, 10);
 
 draw = function() {
