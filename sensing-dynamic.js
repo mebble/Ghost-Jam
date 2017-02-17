@@ -35,12 +35,13 @@ var TestBall = function(r, theta, radius) {
     this.radialAcc = 5;
     this.angAcc = 10;
     
-    var Point = function(parent, r, sub_theta) {
-        this.parent = parent;  //alias
+    var Point = function(ball, r, rel_theta) {
+        this.ball = ball;  //alias
         this.r = r;
-        this.theta = this.parent.direction + sub_theta;
-        this.x = this.r * cos(this.theta) + this.parent.x;
-        this.y = this.r * sin(this.theta) + this.parent.y;
+        this.rel_theta = rel_theta;
+        this.theta = this.ball.direction + this.rel_theta;
+        this.x = this.r * cos(this.theta) + this.ball.x;
+        this.y = this.r * sin(this.theta) + this.ball.y;
         this.detecting = false;
     };
     Point.prototype.draw = function() {
@@ -52,15 +53,15 @@ var TestBall = function(r, theta, radius) {
         
         //minus parents coordinates because the point is drawn on parent's matrix
         //with parent at the origin
-        point(this.x - this.parent.x, this.y - this.parent.y);
+        point(this.x - this.ball.x, this.y - this.ball.y);
     };
     Point.prototype.detect = function(that) {
         return distance(this, that) < that.radius;
     };
     Point.prototype.update = function() {
-        this.theta = this.parent.direction;
-        this.x = this.r * cos(this.theta) + this.parent.x;
-        this.y = this.r * sin(this.theta) + this.parent.y;
+        this.theta = this.ball.direction + this.rel_theta;
+        this.x = this.r * cos(this.theta) + this.ball.x;
+        this.y = this.r * sin(this.theta) + this.ball.y;
     };
     
     //create points
@@ -68,7 +69,7 @@ var TestBall = function(r, theta, radius) {
     for (var i = 1; i <= this.radialAcc; i++) {
         for (var j = 1; j <= this.angAcc; j++) {
             var radEdge = this.radius;
-            var angEdge = this.direction - halfView;
+            var angEdge = -halfView;
             var radFrac = (i/this.radialAcc) * (this.sRadius - this.radius);
             var angFrac = (j/this.angAcc) * this.viewAngle;
             
