@@ -30,13 +30,13 @@ var TestBall = function(r, theta, radius) {
     this.sRadius = 3 * this.radius;
     this.somethingNear = false;
     this.sPoints = [];
-    this.viewAngle = 90;
+    this.viewAngle = 360;
     this.direction = this.theta + 90;
     this.nearbyObject = undefined;
     
     //sensing accuracies
     this.radialAcc = 5;
-    this.angAcc = 10;
+    this.angAcc = 30;
     
     var Point = function(ball, r, rel_theta) {
         this.ball = ball;  //alias
