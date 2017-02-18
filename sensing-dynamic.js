@@ -12,8 +12,8 @@ var Ball = function(r, theta, radius) {
     this.r = r;
     this.theta = theta;
     this.radius = radius;
-    this.x = this.r * cos(this.theta).toFixed(3);
-    this.y = this.r * sin(this.theta).toFixed(3);
+    this.x = this.r * cos(this.theta);
+    this.y = this.r * sin(this.theta);
 };
 Ball.prototype.draw = function() {
     noFill();
@@ -31,7 +31,7 @@ var TestBall = function(r, theta, radius) {
     this.sPoints = [];
     this.viewAngle = 90;
     this.direction = this.theta + 90;
-    this.nearbyObject = {};
+    this.nearbyObject = undefined;
     
     //sensing accuracies
     this.radialAcc = 5;
@@ -109,6 +109,7 @@ TestBall.prototype.draw = function() {
 };
 TestBall.prototype.sense = function(arr) {
     this.somethingNear = false;  //reset
+    this.nearbyObject = undefined;  //reset
     for (var i = 0; i < this.sPoints.length; i++) {
         for (var j = 0; j < arr.length; j++) {
             var point = this.sPoints[i]; //alias
@@ -130,8 +131,8 @@ TestBall.prototype.update = function() {
     }
     this.theta += this.angVel;
     
-    this.x = this.r * cos(this.theta).toFixed(3);
-    this.y = this.r * sin(this.theta).toFixed(3);
+    this.x = this.r * cos(this.theta);
+    this.y = this.r * sin(this.theta);
     
     for (var i = 0; i < this.sPoints.length; i++) {
         this.sPoints[i].update();
