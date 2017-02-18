@@ -25,7 +25,7 @@ Ball.prototype.draw = function() {
 /*** TEST BALL ***/
 var TestBall = function(r, theta, radius) {
     Ball.call(this, r, theta, radius);
-    this.normAngVel = 1;
+    this.normAngVel = 2;
     this.angVel = this.normAngVel;
     this.sRadius = 3 * this.radius;
     this.somethingNear = false;
@@ -33,6 +33,7 @@ var TestBall = function(r, theta, radius) {
     this.viewAngle = 360;
     this.direction = this.theta + 90;
     this.nearbyObject = undefined;
+    this.gap = 10;
     
     //sensing accuracies
     this.radialAcc = 5;
@@ -141,8 +142,9 @@ TestBall.prototype.update = function() {
     
     //update angular velocity
     if (this.nearbyObject) {
-        var d = distance(this, this.nearbyObject) - (this.radius+this.nearbyObject.radius);
-        this.angVel = d * this.normAngVel/(this.sRadius - this.radius);  //y = xm
+        var d = distance(this, this.nearbyObject) - (this.radius + this.nearbyObject.radius);
+        var slope = this.normAngVel/(this.sRadius - this.radius - this.gap);
+        this.angVel = slope * (d - this.gap);  //y = m * (x - x-intercept)
     } else {
         this.angVel = this.normAngVel;
     }
@@ -161,7 +163,7 @@ ControlledBall.prototype.update = function() {
 };
 
 var test = new TestBall(100, 270, 30);
-var control = new ControlledBall(150, 0, 10);
+var control = new ControlledBall(150, 0, 30);
 
 draw = function() {
     background(255);
