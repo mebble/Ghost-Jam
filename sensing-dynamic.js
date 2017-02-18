@@ -3,17 +3,17 @@ var XOFF = width/2;
 var YOFF = height/2;
 angleMode = "degrees";
 
-var distance = function(obj1, obj2) {
-    return dist(obj1.x, obj1.y, obj2.x, obj2.y);
+var distance = function(a, b) {
+    return dist(a.x, a.y, b.x, b.y);
 };
 
 /*** BALL ***/
 var Ball = function(r, theta, radius) {
     this.r = r;
     this.theta = theta;
+    this.radius = radius;
     this.x = this.r * cos(this.theta).toFixed(3);
     this.y = this.r * sin(this.theta).toFixed(3);
-    this.radius = radius;
 };
 Ball.prototype.draw = function() {
     noFill();
@@ -27,10 +27,11 @@ var TestBall = function(r, theta, radius) {
     Ball.call(this, r, theta, radius);
     this.angVel = 1;
     this.sRadius = 3 * this.radius;
-    this.objNear = false;
+    this.somethingNear = false;
     this.sPoints = [];
     this.viewAngle = 90;
     this.direction = this.theta + 90;
+    this.nearbyObject = {};
     
     //sensing accuracies
     this.radialAcc = 5;
@@ -56,8 +57,8 @@ var TestBall = function(r, theta, radius) {
         //with parent at the origin
         point(this.x - this.ball.x, this.y - this.ball.y);
     };
-    Point.prototype.detect = function(that) {
-        return distance(this, that) < that.radius;
+    Point.prototype.senseDist = function(that) {
+        this.detecting = distance(this, that) < that.radius;
     };
     Point.prototype.update = function() {
         this.theta = this.ball.direction + this.rel_theta;
@@ -98,7 +99,7 @@ TestBall.prototype.draw = function() {
         
         //draw ball
         stroke(0);
-        if (this.objNear) {
+        if (this.somethingNear) {
             stroke(255, 0, 0);
         }
         strokeWeight(1);
@@ -107,13 +108,18 @@ TestBall.prototype.draw = function() {
     popMatrix();
 };
 TestBall.prototype.sense = function(arr) {
-    this.objNear = false;  //reset
+    this.somethingNear = false;  //reset
     for (var i = 0; i < this.sPoints.length; i++) {
         for (var j = 0; j < arr.length; j++) {
-            var pt = this.sPoints[i]; //alias
-            pt.detecting = pt.detect(arr[j]);
-            this.objNear = this.objNear || pt.detecting;
-            if (pt.detecting) {break;}  //if (this.objNear) {break;} ??
+            var point = this.sPoints[i]; //alias
+            var ball = arr[j];           //alias
+            
+            point.senseDist(ball);
+            if (point.detecting) {
+                this.somethingNear = true;
+                this.nearbyObject = ball;
+                break;
+            }
         }
     }
 };
