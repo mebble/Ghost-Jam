@@ -13,11 +13,10 @@ Sensor.prototype.draw = function() {
 	if (this.detecting) {
 		stroke(255, 0, 0);
 	}
-
 	//minus owner's coordinates because the point is drawn on owner's matrix
-    //with owner at the origin. The information though (this.x and this.y)
-    //have to be with respect to the global matrix
-    point(this.x - this.owner.x, this.y - this.owner.y);
+    	//with owner at the origin. The information though (this.x and this.y)
+    	//have to be with respect to the global matrix
+    	point(this.x - this.owner.x, this.y - this.owner.y);
 };
 Sensor.prototype.senseDist = function(that) {
 	this.detecting = distance(this, that) < that.size;
