@@ -7,7 +7,7 @@ var SelfDriving = function(radialDist, theta, size, normVel) {
 	this.sensingRange = 3 * this.size;
 	this.viewAngle = 90;
 	this.direction = this.theta + 90;
-	this.gap = 10;
+	this.followingDist = 10;
 	this.somethingNear = false;
 	this.nearbyObject = undefined;
 	this.sensors = [];
@@ -73,8 +73,8 @@ SelfDriving.prototype.update = function() {
 	//update angular velocity
 	if (this.nearbyObject) {
 		var d = distance(this, this.nearbyObject) - (this.size + this.nearbyObject.size);
-		var slope = this.normVel / ((this.sensingRange - this.size) - this.gap);
-		this.angVel = slope * (d - this.gap); //y = m * (x - x-intercept)
+		var slope = this.normVel / ((this.sensingRange - this.size) - this.followingDist);
+		this.angVel = slope * (d - this.followingDist); //y = m * (x - x-intercept)
 	} else {
 		this.angVel = this.normVel;
 	}
